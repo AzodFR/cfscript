@@ -7,7 +7,7 @@ export default {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'FWScript',
+    title: 'CFScript',
     htmlAttrs: {
       lang: 'en'
     },

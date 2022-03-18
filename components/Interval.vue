@@ -114,7 +114,6 @@ await fetch("https://chain.wax.io/v1/chain/get_account", {
       setInterval(() => {
         this.fetchMbs();
         this.fetchItems("tools");
-        this.fetchCrops("crops");
       }, time);
     },
     findInTemplate: function (type, id) {
@@ -354,12 +353,10 @@ await fetch("https://chain.wax.io/v1/chain/get_account", {
       )
         .then((x) => x.json())
         .then((user) => {
-          for(let i = 0; i < 3; i++) {
-            this.$store.commit("user/setRessource", {
-            type: user.rows[0].balances[i].split(' ')[1],
-            value: user.rows[0].balances[i].split(' ')[0],
-          });
-          }
+
+          this.$store.commit("user/setRessource", {type: "BTC", value: user.rows[0].btc_balance.split(' ')[0] });
+          this.$store.commit("user/setRessource", {type: "ETH", value: user.rows[0].eth_balance.split(' ')[0]});
+          this.$store.commit("user/setRessource", {type: "PWR", value: user.rows[0].pwr_balance.split(' ')[0] });
           this.$store.commit("user/setEnergy", user.rows[0].energy);
           this.$store.commit("user/setMaxEnergy", user.rows[0].max_energy);
         });

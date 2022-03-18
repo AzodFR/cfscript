@@ -53,7 +53,7 @@
       </div>
       <div class="token-div">
         <label class="token-title">Tokens:</label>
-        <p class="game-info-t">{{ user.tokens["CFG"] }}</p>
+        <p class="game-info-t">{{ user.tokens["CFB"] }}</p>
         <p class="game-info-t">{{ user.tokens["CFE"] }}</p>
         <p class="game-info-t">{{ user.tokens["CFP"] }}</p>
       </div>

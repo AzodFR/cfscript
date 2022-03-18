@@ -9,7 +9,7 @@
     </div>
     <div class="items-claim">
       <div class="item-claim" v-for="(item, i) in list" :key="i">
-        <label class="item-name">{{ item.name.slice(toTrim)}} {{type == "Members" ? " " + item.type : ""}} {{type == "Crops" ? item.times_claimed : calc(item)}} / {{type == "Crops" ? "42" : member + 1}}</label>
+        <label class="item-name">{{ item.name}} {{type == "Members" ? " " + item.type : ""}}</label>
         <CounterV2
         ref="counter"
           class="counter-div"
