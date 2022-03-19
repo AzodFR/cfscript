@@ -150,6 +150,7 @@ await fetch("https://chain.wax.io/v1/chain/get_account", {
             elem.claim_type = tmp.type;
             elem.saved_claims = tmp.saved_claims;
             elem.charged_time = tmp.charged_time * 3600;
+            elem.next_availability_mbs = elem.next_availability
             if (!this.$store.state.user.logged_asset.includes(elem.asset_id)) {
               this.$store.commit("user/addAsset", elem.asset_id);
               this.$store.commit("user/addMbs", {type: elem.claim_type, value: tmp.saved_claims})
