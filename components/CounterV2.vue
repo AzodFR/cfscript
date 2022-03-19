@@ -124,7 +124,7 @@ export default {
         const now = new Date();
         const stake = this.timestamp
 
-        const end = new Date(stake);
+        const end = new Date(this.timestamp);
         const distance = end.getTime() - now.getTime();
         if (
           this.$store.state.user.autorepair[this.claiminfo.type][

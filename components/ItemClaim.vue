@@ -14,7 +14,7 @@
         ref="counter"
           class="counter-div"
           :item="item"
-          :timestamp="item.next_availability"
+          :timestamp="item.next_availability_mbs"
           :claiminfo="claimInfo"
           :autoclaim="
             `this.$store.state.user.items['${type}']['item.asset_id']` === true
