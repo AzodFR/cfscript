@@ -113,9 +113,13 @@
           PWR <img src="https://www.cryptofarms.f12key.shadysapy.fr/assets/img/coins/cfp.png" referrerpolicy="no-referrer" class="game-img" />
         </p>
       </div>
-      <div style="display: flex">
+     <div style="display: flex">
         <b-button size="sm" v-b-tooltip.hover title="Activate this to refresh the page every 30 min." :variant="autologin ? 'success': 'danger'" @click="switchLog">AutoLogin: {{autologin ? "ON" : "OFF"}}</b-button>
       <Energy />
+
+ <label for="configH" style="font-size:small;">Config hours</label>
+      <b-form-input type="number" min="-24" max="24" step="1" id="configH" v-model="hours" class="hours-config" @change="updateHours"></b-form-input>
+
       </div>
     </div>
     <div class="items" v-if="this['user/getItems']['Power'].length">
@@ -226,7 +230,8 @@ export default {
   data() {
     return {
       autologin: false,
-      refresh: null
+      refresh: null,
+      hours: 0,
     }
   },
   computed: {
@@ -249,9 +254,18 @@ export default {
       else {
         clearTimeout(this.refresh);
       }
+    },
+    updateHours: function() {
+      localStorage.setItem('hours', this.hours)
     }
   },
   mounted() {
+    if (localStorage.getItem("hours")){
+      this.hours = localStorage.getItem("hours");
+    }
+    else {
+      localStorage.setItem("hours", 0);
+    }
     if (localStorage.getItem("autoLogin") && localStorage.getItem("autoLogin") == "true")
     {
       this.autologin = true;
@@ -471,5 +485,9 @@ export default {
   width: 60%;
   margin-left: 20%;
   border: 1px solid rgba(128, 128, 128, 0.363);
+}
+.hours-config {
+  width: 6%;
+  font-size: small;
 }
 </style>
