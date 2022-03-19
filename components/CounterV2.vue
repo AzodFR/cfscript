@@ -125,7 +125,7 @@ export default {
         const stake = this.timestamp
 
         const end = new Date(this.timestamp);
-        const distance = end.getTime() - now.getTime();
+        const distance = end.getTime() - now.getTime() + 3600000;
         if (
           this.$store.state.user.autorepair[this.claiminfo.type][
             this.item.asset_id
