@@ -144,7 +144,7 @@ export default {
           ) {
             let cost =
               (this.item.durability - this.item.current_durability) * 0.3;
-            if (this.$store.state.user.ressources[this.claiminfo.type == "Asic" ? "ETH" : "BTC"] >= cost) {
+            if (this.$store.state.user.ressources[this.claiminfo.type == "GPU" ? "BTC" : "ETH"] >= cost) {
               const r_action = {
                 actions: [
                   {
@@ -270,7 +270,7 @@ export default {
             ) {
               let cost =
                 (this.item.durability - this.item.current_durability) * 0.2;
-              if (this.$store.state.user.ressources[this.claiminfo.type == "Asic" ? "ETH" : "BTC"] >= cost) {
+              if (this.$store.state.user.ressources[this.claiminfo.type == "GPU" ? "BTC" : "ETH"] >= cost) {
                 const r_action = {
                   actions: [
                     {
