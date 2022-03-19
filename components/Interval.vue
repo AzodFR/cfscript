@@ -203,13 +203,13 @@ await fetch("https://chain.wax.io/v1/chain/get_account", {
           };
           await items.rows.forEach(async (elem) => {
             const tmp = this.findInTemplate("tools", elem.template_id);
-            elem.name = tmp.template_name
+            elem.name = tmp.name;
             elem.durability_usage = tmp.durability_consumed;
             elem.claim_type = tmp.type;
             elem.production = parseInt(tmp.rewards[0].split(' ')[0]);
             elem.power_usage = tmp.energy_consumed;
             elem.charged_time = tmp.charged_time * 3600;
-            elem.next_availability_mbs = new Date(elem.next_availability).getTime()
+            elem.next_availability = new Date(elem.next_availability_mbs).getTime()
             if (!this.$store.state.user.logged_asset.includes(elem.asset_id)) {
               this.$store.commit("user/addAsset", elem.asset_id);
 
