@@ -10,6 +10,7 @@
 </template>
 
 <script>
+const utcNow = require('utc-now');
 export default {
   name: "Counter",
   props: ["timestamp", "autoclaim", "item", "claiminfo"],
@@ -121,11 +122,10 @@ export default {
     },
     showRemaining() {
       const timer = setInterval(() => {
-        const now = new Date();
-        const stake = this.timestamp
 
         const end = new Date(this.timestamp);
-        const distance = end.getTime() - now.getTime() + (3600000 * localStorage.getItem("hours"));
+        const stake = this.timestamp
+        const distance = end.getTime() - utcNow() ;
         if (
           this.$store.state.user.autorepair[this.claiminfo.type][
             this.item.asset_id

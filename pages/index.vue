@@ -4,7 +4,7 @@
       <p class="txt">
         Created by
         <span class="dev1"> Azod#9999 (vzfjg.wam) </span>
-        (v0.2)
+        (v0.3)
       </p>
     </div>
     <DefiLogo v-if="name == ''"/>

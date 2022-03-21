@@ -117,8 +117,7 @@
         <b-button size="sm" v-b-tooltip.hover title="Activate this to refresh the page every 30 min." :variant="autologin ? 'success': 'danger'" @click="switchLog">AutoLogin: {{autologin ? "ON" : "OFF"}}</b-button>
       <Energy />
 
- <label for="configH" style="font-size:small;">Config hours</label>
-      <b-form-input type="number" min="-24" max="24" step="1" id="configH" v-model="hours" class="hours-config" @change="updateHours"></b-form-input>
+
 
       </div>
     </div>
@@ -231,7 +230,6 @@ export default {
     return {
       autologin: false,
       refresh: null,
-      hours: 0,
     }
   },
   computed: {
@@ -260,12 +258,7 @@ export default {
     }
   },
   mounted() {
-    if (localStorage.getItem("hours")){
-      this.hours = localStorage.getItem("hours");
-    }
-    else {
-      localStorage.setItem("hours", 0);
-    }
+
     if (localStorage.getItem("autoLogin") && localStorage.getItem("autoLogin") == "true")
     {
       this.autologin = true;
