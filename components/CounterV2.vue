@@ -144,7 +144,7 @@ export default {
           ) {
             let cost =
               (this.item.durability - this.item.current_durability) * 0.3;
-            if (this.$store.state.user.ressources[this.claiminfo.type == "GPU" ? "BTC" : "ETH"] >= cost) {
+            if (this.$store.state.user.ressources[this.claiminfo.type == "Asic" ? "ETH" : "BTC"] >= cost) {
               const r_action = {
                 actions: [
                   {
@@ -270,7 +270,7 @@ export default {
             ) {
               let cost =
                 (this.item.durability - this.item.current_durability) * 0.2;
-              if (this.$store.state.user.ressources[this.claiminfo.type == "GPU" ? "BTC" : "ETH"] >= cost) {
+              if (this.$store.state.user.ressources[this.claiminfo.type == "Asic" ? "ETH" : "BTC"] >= cost) {
                 const r_action = {
                   actions: [
                     {
@@ -283,7 +283,7 @@ export default {
                         },
                       ],
                       data: {
-                        asset_owner: this.$store.state.user.name,
+                        owner: this.$store.state.user.name,
                         asset_id: this.item.asset_id,
                       },
                     },
