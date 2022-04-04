@@ -144,7 +144,6 @@ export default {
           ) {
             let cost =
               (this.item.durability - this.item.current_durability) * 0.3;
-            if (this.$store.state.user.ressources[this.claiminfo.type == "Asic" ? "ETH" : "BTC"] >= cost) {
               const r_action = {
                 actions: [
                   {
@@ -174,7 +173,7 @@ export default {
               };
               console.log("add to repair");
               this.$store.commit("user/addRAction", r_transac);
-            }
+            
           }
         }
         if (distance <= 0) {
@@ -270,7 +269,6 @@ export default {
             ) {
               let cost =
                 (this.item.durability - this.item.current_durability) * 0.2;
-              if (this.$store.state.user.ressources[this.claiminfo.type == "Asic" ? "ETH" : "BTC"] >= cost) {
                 const r_action = {
                   actions: [
                     {
@@ -299,7 +297,7 @@ export default {
                   block: r_block,
                 };
                 this.$store.commit("user/addRAction", r_transac);
-              }
+              
             }
           }
           //alert("claiming !");
