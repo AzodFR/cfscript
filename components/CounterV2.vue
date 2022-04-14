@@ -120,62 +120,15 @@ export default {
         }, 5000)
       }
     },
-    showRemaining() {
-      const timer = setInterval(() => {
+    async showRemaining() {
+      const timer = setInterval(async () => {
 
         const end = new Date(this.timestamp);
         const stake = this.timestamp
         const distance = end.getTime() - utcNow() ;
-        if (
-          this.$store.state.user.autorepair[this.claiminfo.type][
-            this.item.asset_id
-          ] === true &&
-          !(
-            this.$store.state.user.actions.find((x) => x.id === this.item.id) !=
-            undefined
-          )
-        ) {
-          if (
-            this.claiminfo.type != "Members" && this.claiminfo.type != "Crops" &&
-            this.item.current_durability <= this.item.durability_usage * this.$store.state.user.members[this.claiminfo.type] &&
-            this.$store.state.user.autorepair[this.claiminfo.type][
-              this.item.asset_id
-            ]
-          ) {
-            let cost =
-              (this.item.durability - this.item.current_durability) * 0.3;
-              const r_action = {
-                actions: [
-                  {
-                    account: "cryptofarmsg",
-                    name: this.claiminfo.r_action,
-                    authorization: [
-                      {
-                        actor: this.$store.state.user.name,
-                        permission: "active",
-                      },
-                    ],
-                    data: {
-                      owner : this.$store.state.user.name,
-                      asset_id: this.item.asset_id,
-                    },
-                  },
-                ],
-              };
-              const r_block = {
-                blocksBehind: 3,
-                expireSeconds: 30,
-              };
-              const r_transac = {
-                id: this.item.asset_id,
-                action: r_action,
-                block: r_block,
-              };
-              console.log("add to repair");
-              this.$store.commit("user/addRAction", r_transac);
-            
-          }
-        }
+
+        await this.checkRepair()
+
         if (distance <= 0) {
           clearInterval(timer);
           if (this.last == undefined) {
@@ -206,6 +159,56 @@ export default {
 
         this.loaded = true;
       }, 1000);
+    },
+    async checkRepair(){
+       if (
+          this.$store.state.user.autorepair[this.claiminfo.type][
+            this.item.asset_id
+          ] === true &&
+          !(
+            this.$store.state.user.actions.find((x) => x.id === this.item.id) !=
+            undefined
+          )
+        ) {
+          if (
+            this.item.current_durability <= this.item.durability / 4 &&
+            this.$store.state.user.autorepair[this.claiminfo.type][
+              this.item.asset_id
+            ]
+          ) {
+            console.log(this.item.current_durability, this.item.durability / 4)
+              const r_action = {
+                actions: [
+                  {
+                    account: "cryptofarmsg",
+                    name: this.claiminfo.r_action,
+                    authorization: [
+                      {
+                        actor: this.$store.state.user.name,
+                        permission: "active",
+                      },
+                    ],
+                    data: {
+                      owner : this.$store.state.user.name,
+                      asset_id: this.item.asset_id,
+                    },
+                  },
+                ],
+              };
+              const r_block = {
+                blocksBehind: 3,
+                expireSeconds: 30,
+              };
+              const r_transac = {
+                id: this.item.asset_id,
+                action: r_action,
+                block: r_block,
+              };
+              console.log("add to repair");
+              this.$store.commit("user/addRAction", r_transac);
+
+          }
+        }
     },
     async handleClaim() {
       if (
@@ -261,44 +264,7 @@ export default {
               ) != undefined
             )
               return;
-            if ( this.claiminfo.type != "Members" && this.claiminfo.type != "Crops" &&
-              this.item.current_durability <= this.item.durability_usage * this.$store.state.user.members[this.claiminfo.type] &&
-              this.$store.state.user.autorepair[this.claiminfo.type][
-                this.item.asset_id
-              ]
-            ) {
-              let cost =
-                (this.item.durability - this.item.current_durability) * 0.2;
-                const r_action = {
-                  actions: [
-                    {
-                      account: "cryptofarmsg",
-                      name: this.claiminfo.r_action,
-                      authorization: [
-                        {
-                          actor: this.$store.state.user.name,
-                          permission: "active",
-                        },
-                      ],
-                      data: {
-                        owner: this.$store.state.user.name,
-                        asset_id: this.item.asset_id,
-                      },
-                    },
-                  ],
-                };
-                const r_block = {
-                  blocksBehind: 3,
-                  expireSeconds: 30,
-                };
-                const r_transac = {
-                  id: this.item.asset_id,
-                  action: r_action,
-                  block: r_block,
-                };
-                this.$store.commit("user/addRAction", r_transac);
-              
-            }
+            this.checkRepair()
           }
           //alert("claiming !");
         } catch (e) {
