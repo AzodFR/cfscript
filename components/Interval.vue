@@ -3,12 +3,18 @@
 </template>
 
 <script>
+const { JsonRpc } = require("eosjs");
 const time = 15000;
 export default {
   name: "Interval",
   async mounted() {
-    this.checkRPC();
-    this.launchCheck();
+    if (
+      !localStorage.getItem("blockedRPC") ||
+      localStorage.getItem("blockedRPC") == "false"
+    ) {
+      this.checkRPC();
+      this.launchCheck();
+    }
     await this.getTemplates();
     this.fetchTokens();
     this.launchFetchStake();
@@ -18,97 +24,115 @@ export default {
     this.launchIntervalInfo();
     this.fetchItems("tools");
     this.launchIntervalItems();
-
   },
   methods: {
-    launchCheck: async function() {
-    setInterval(async () => {
-      this.checkRPC()
-      },600000)
+    launchCheck: async function () {
+      setInterval(async () => {
+        this.checkRPC();
+      }, 600000);
     },
-    checkRPC: async function() {
+    checkRPC: async function () {
       let valid = false;
 
-        setTimeout(() => {
-          if (valid) {
-            valid = false
-            console.log("rpc checked")
+      setTimeout(() => {
+        if (valid) {
+          valid = false;
+          console.log("rpc checked");
+        } else {
+          console.log("fuck rpc");
+          if (
+            !localStorage.getItem("blockedRPC") ||
+            localStorage.getItem("blockedRPC") == "false"
+          )
+            localStorage.setItem("rpc", "random");
+          if (
+            localStorage.getItem("blockedRPC") ||
+            localStorage.getItem("blockedRPC") == "true"
+          )
+            valid = true;
+          if (
+            !localStorage.getItem("autoLogin") ||
+            localStorage.getItem("autoLogin") == "false"
+          ) {
+            localStorage.setItem("autoLogin", "rpc");
           }
-          else {
-            console.log("fuck rpc")
-            localStorage.setItem('rpc', 'random');
-            if (!localStorage.getItem("autoLogin") ||  localStorage.getItem("autoLogin") == "false"){
-            localStorage.setItem("autoLogin", "rpc")
-            }
-            window.location.href = "/"
-          }
-        }, 20000);
-        try {
-        await fetch(
-        `${this.$store.state.user.wax.rpc.endpoint}/v1/chain/get_table_rows`,
-        {
-          credentials: "omit",
-          headers: {
-            Accept: "*/*",
-            "Accept-Language": "fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3",
-            "Content-Type": "text/plain;charset=UTF-8",
-            "Sec-Fetch-Dest": "empty",
-            "Sec-Fetch-Mode": "no-cors",
-            "Sec-Fetch-Site": "cross-site",
-          },
-          referrer: "https://thedefimining.io/",
-          body: `{\"json\":true,\"code\":\"cryptofarmsg\",\"scope\":\"cryptofarmsg\",\"table\":\"accounts\",\"table_key\":\"\",\"lower_bound\":\"${this.$store.state.user.name}\",\"upper_bound\":\"${this.$store.state.user.name}\",\"limit\":\"100\",\"reverse\":false,\"show_payer\":false}`,
-          method: "POST",
-          mode: "cors",
+          window.location.href = "/";
         }
-      ).then((e) =>  {
-        console.log("check", e)
-        valid = true}
+      }, 20000);
+      try {
+        const rpc = new JsonRpc(this.$store.state.user.wax.rpc.endpoint, {
+          fetch,
+        });
+        await rpc
+          .get_info()
+          .catch((e) => {
+            valid = false;
+            console.log("fuck rpc");
+            if (
+              !localStorage.getItem("blockedRPC") ||
+              localStorage.getItem("blockedRPC") == "false"
+            )
+              localStorage.setItem("rpc", "random");
+            if (
+              !localStorage.getItem("autoLogin") ||
+              localStorage.getItem("autoLogin") == "false"
+            ) {
+              localStorage.setItem("autoLogin", "rpc");
+            }
+            window.location.href = "/";
+          })
+          .then(() => {
+            valid = true;
+          });
+      } catch (e) {
+        valid = false;
+        console.log("fuck rpc");
+        if (
+          !localStorage.getItem("blockedRPC") ||
+          localStorage.getItem("blockedRPC") == "false"
         )
-      .catch((e) => {
-        console.log("fuck rpc")
-            localStorage.setItem('rpc', 'random');
-            if (!localStorage.getItem("autoLogin") ||  localStorage.getItem("autoLogin") == "false"){
-            localStorage.setItem("autoLogin", "rpc")
-            }
-            window.location.href = "/"
-      })
+          localStorage.setItem("rpc", "random");
+        if (
+          !localStorage.getItem("autoLogin") ||
+          localStorage.getItem("autoLogin") == "false"
+        ) {
+          localStorage.setItem("autoLogin", "rpc");
         }
-        catch (e) {
-          onsole.log("fuck rpc")
-            localStorage.setItem('rpc', 'random');
-            if (!localStorage.getItem("autoLogin") ||  localStorage.getItem("autoLogin") == "false"){
-            localStorage.setItem("autoLogin", "rpc")
-            }
-            window.location.href = "/"
-        }
-
+        window.location.href = "/";
+      }
     },
-    launchFetchStake: function() {
+    launchFetchStake: function () {
       this.fetchStake();
       setInterval(() => {
         this.fetchStake();
-      }, time)
+      }, time);
     },
-    fetchStake: async function() {
-await fetch("https://chain.wax.io/v1/chain/get_account", {
-    "credentials": "omit",
-    "headers": {
-        "Accept-Language": "fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3",
+    fetchStake: async function () {
+      await fetch("https://wax.cryptolions.io/v1/chain/get_account", {
+        credentials: "omit",
+        headers: {
+          "Accept-Language": "fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3",
           "Content-Type": "text/plain;charset=UTF-8",
           "Sec-Fetch-Dest": "empty",
           "Sec-Fetch-Mode": "no-cors",
           "Sec-Fetch-Site": "cross-site",
-    },
-    "referrer": "https://fw.f12key.xyz/",
-    "body": `{\"account_name\":\"${this.$store.state.user.name}\"}`,
-    "method": "POST",
-    "mode": "cors"
-}).then((x) => x.json())
+        },
+        referrer: "https://fw.f12key.xyz/",
+        body: `{\"account_name\":\"${this.$store.state.user.name}\"}`,
+        method: "POST",
+        mode: "cors",
+      })
+        .then((x) => x.json())
         .then(async (rows) => {
-          this.$store.commit("user/setStake", parseFloat(rows.total_resources.cpu_weight.split(" ")[0]).toFixed(2));
-          this.$store.commit("user/setCPU", (rows.cpu_limit.used * 100 / rows.cpu_limit.max).toFixed(0));
-        })
+          this.$store.commit(
+            "user/setStake",
+            parseFloat(rows.total_resources.cpu_weight.split(" ")[0]).toFixed(2)
+          );
+          this.$store.commit(
+            "user/setCPU",
+            ((rows.cpu_limit.used * 100) / rows.cpu_limit.max).toFixed(0)
+          );
+        });
     },
     launchIntervalItems: function () {
       setInterval(() => {
@@ -125,8 +149,8 @@ await fetch("https://chain.wax.io/v1/chain/get_account", {
       });
       return template;
     },
-        async fetchMbs() {
-      await fetch("https://wax.greymass.com/v1/chain/get_table_rows", {
+    async fetchMbs() {
+      await fetch("https://wax.cryptolions.io/v1/chain/get_table_rows", {
         credentials: "omit",
         headers: {
           Accept: "*/*",
@@ -146,14 +170,17 @@ await fetch("https://chain.wax.io/v1/chain/get_account", {
           const newList = [];
           await items.rows.forEach(async (elem) => {
             const tmp = this.findInTemplate("members", elem.template_id);
-            elem.name = tmp.name
+            elem.name = tmp.name;
             elem.claim_type = tmp.type;
             elem.saved_claims = tmp.saved_claims;
             elem.charged_time = tmp.charged_time * 3600;
-            elem.next_availability_mbs = elem.next_availability
+            elem.next_availability_mbs = elem.next_availability;
             if (!this.$store.state.user.logged_asset.includes(elem.asset_id)) {
               this.$store.commit("user/addAsset", elem.asset_id);
-              this.$store.commit("user/addMbs", {type: elem.claim_type, value: tmp.saved_claims})
+              this.$store.commit("user/addMbs", {
+                type: elem.claim_type,
+                value: tmp.saved_claims,
+              });
             }
             if (localStorage.getItem(`${elem.asset_id}`)) {
               if (localStorage.getItem(`${elem.asset_id}`) == "true") {
@@ -174,12 +201,15 @@ await fetch("https://chain.wax.io/v1/chain/get_account", {
             newList.push(elem);
           });
           if (newList.length) {
-            this.$store.commit("user/setItem", { value: newList, type: "Members" });
+            this.$store.commit("user/setItem", {
+              value: newList,
+              type: "Members",
+            });
           }
         });
     },
     async fetchItems(item) {
-      await fetch("https://wax.greymass.com/v1/chain/get_table_rows", {
+      await fetch("https://wax.cryptolions.io/v1/chain/get_table_rows", {
         credentials: "omit",
         headers: {
           Accept: "*/*",
@@ -196,29 +226,29 @@ await fetch("https://chain.wax.io/v1/chain/get_account", {
       })
         .then((x) => x.json())
         .then(async (items) => {
-
           const newList = {
-            "Power": [],
-            "Asic": [],
-            "GPU": []
+            Power: [],
+            Asic: [],
+            GPU: [],
           };
           await items.rows.forEach(async (elem) => {
             const tmp = this.findInTemplate("tools", elem.template_id);
             elem.name = tmp.name;
             elem.durability_usage = tmp.durability_consumed;
             elem.claim_type = tmp.type;
-            elem.production = parseInt(tmp.rewards[0].split(' ')[0]);
+            elem.production = parseInt(tmp.rewards[0].split(" ")[0]);
             elem.power_usage = tmp.energy_consumed;
             elem.charged_time = tmp.charged_time * 3600;
-            elem.next_availability = new Date(elem.next_availability_mbs).getTime()
+            elem.next_availability = new Date(
+              elem.next_availability_mbs
+            ).getTime();
             if (!this.$store.state.user.logged_asset.includes(elem.asset_id)) {
               this.$store.commit("user/addAsset", elem.asset_id);
 
-
-                this.$store.commit("user/addProduction", {
-                  type: elem.claim_type.toUpperCase(),
-                  value: elem.production,
-                });
+              this.$store.commit("user/addProduction", {
+                type: elem.claim_type.toUpperCase(),
+                value: elem.production,
+              });
 
               this.$store.commit("user/addCost", {
                 type: "FOOD",
@@ -270,15 +300,23 @@ await fetch("https://chain.wax.io/v1/chain/get_account", {
             newList[elem.claim_type].push(elem);
           });
           if (newList["Power"].length) {
-            this.$store.commit("user/setItem", { value: newList["Power"], type: "Power" });
+            this.$store.commit("user/setItem", {
+              value: newList["Power"],
+              type: "Power",
+            });
           }
           if (newList["Asic"].length) {
-            this.$store.commit("user/setItem", { value: newList["Asic"], type: "Asic" });
+            this.$store.commit("user/setItem", {
+              value: newList["Asic"],
+              type: "Asic",
+            });
           }
           if (newList["GPU"].length) {
-            this.$store.commit("user/setItem", { value: newList["GPU"], type: "GPU" });
+            this.$store.commit("user/setItem", {
+              value: newList["GPU"],
+              type: "GPU",
+            });
           }
-
         });
     },
     async getTemplates() {
@@ -302,9 +340,12 @@ await fetch("https://chain.wax.io/v1/chain/get_account", {
       )
         .then((x) => x.json())
         .then((y) => {
-          this.$store.commit("user/setTemplates", {type: "tools", rows: y.rows});
+          this.$store.commit("user/setTemplates", {
+            type: "tools",
+            rows: y.rows,
+          });
         });
-        await fetch(
+      await fetch(
         `${this.$store.state.user.wax.rpc.endpoint}/v1/chain/get_table_rows`,
         {
           credentials: "omit",
@@ -324,11 +365,14 @@ await fetch("https://chain.wax.io/v1/chain/get_account", {
       )
         .then((x) => x.json())
         .then((y) => {
-          this.$store.commit("user/setTemplates", {type: "members", rows: y.rows});
+          this.$store.commit("user/setTemplates", {
+            type: "members",
+            rows: y.rows,
+          });
         });
     },
     async launchIntervalInfo() {
-      this.fetchUserInfo()
+      this.fetchUserInfo();
       setInterval(() => {
         this.fetchUserInfo();
       }, time);
@@ -354,10 +398,18 @@ await fetch("https://chain.wax.io/v1/chain/get_account", {
       )
         .then((x) => x.json())
         .then((user) => {
-
-          this.$store.commit("user/setRessource", {type: "BTC", value: user.rows[0].btc_balance.split(' ')[0] });
-          this.$store.commit("user/setRessource", {type: "ETH", value: user.rows[0].eth_balance.split(' ')[0]});
-          this.$store.commit("user/setRessource", {type: "PWR", value: user.rows[0].pwr_balance.split(' ')[0] });
+          this.$store.commit("user/setRessource", {
+            type: "BTC",
+            value: user.rows[0].btc_balance.split(" ")[0],
+          });
+          this.$store.commit("user/setRessource", {
+            type: "ETH",
+            value: user.rows[0].eth_balance.split(" ")[0],
+          });
+          this.$store.commit("user/setRessource", {
+            type: "PWR",
+            value: user.rows[0].pwr_balance.split(" ")[0],
+          });
           this.$store.commit("user/setEnergy", user.rows[0].energy);
           this.$store.commit("user/setMaxEnergy", user.rows[0].max_energy);
         });
